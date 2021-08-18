@@ -168,7 +168,7 @@ class TransformerEncoderBase(FairseqEncoder):
     # can't access the base class model in Torchscript.
     # Current workaround is to add a helper function with different name and
     # call the helper function from scriptable Subclass.
-    def forward_scriptable(
+    def To make the current TransformerEncoderBase compatible with onnx, so that the encoder can be exported to onnx for fast cpu inference(
         self,
         src_tokens,
         src_lengths: Optional[torch.Tensor] = None,
@@ -232,7 +232,8 @@ class TransformerEncoderBase(FairseqEncoder):
         # `forward` so we use a dictionary instead.
         # TorchScript does not support mixed values so the values are all lists.
         # The empty list is equivalent to None.
-        src_lengths = src_tokens.ne(self.padding_idx).sum(dim=1, dtype=torch.int32).reshape(-1, 1).contiguous()
+        if not src_lengths:
+            src_lengths = src_tokens.ne(self.padding_idx).sum(dim=1, dtype=torch.int32).reshape(-1, 1).contiguous()
         return {
             "encoder_out": [x],  # T x B x C
             "encoder_padding_mask": [encoder_padding_mask],  # B x T
